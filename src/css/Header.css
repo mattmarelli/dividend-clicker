@@ -1,0 +1,39 @@
+.header {
+  min-height: 10vh;
+  max-height: 10vh;
+  min-width: 100%;
+  max-width: 100%;
+}
+
+.basicSharesLabel {
+  text-align: left;
+  max-height: 3.33vh;
+  min-width: 20vw;
+  max-width: 20vw;
+}
+
+.basicSharesInfo {
+  position: absolute;
+  bottom: 93%;
+  left: 10%;
+  background: black;
+  color: white;
+  padding: 0.5rem;
+  border-radius: 6px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.basicSharesLabel:hover .basicSharesInfo {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.moneyLabel {
+  text-align: left;
+  max-height: 3.33vh;
+  min-width: 20vw;
+  max-width: 20vw;
+}
