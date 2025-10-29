@@ -1,8 +1,13 @@
-function Upgrades() {
+function Upgrades({currentMoneyPerClick, clickMoneyUpgradeCost, purchaseMoneyPerClickUpgradeFunction}) {
 
   return (
     <div>
-      This is the upgrade screen!!!
+      <button onClick={purchaseMoneyPerClickUpgradeFunction}>
+        <div>Increase Money Per Click</div>
+        <div>Currently: {currentMoneyPerClick}</div>
+        <div>Next: {currentMoneyPerClick + 1}</div>
+        <div>Cost: {clickMoneyUpgradeCost}</div>
+      </button>
     </div>
   )
 }
