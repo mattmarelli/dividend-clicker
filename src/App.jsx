@@ -10,6 +10,7 @@ import {
 import Header from './components/Header';
 import MainGame from './components/MainGame';
 import SideNav from './components/SideNav';
+import formatNumber from './helpers';
 
 function App() {
   var [shareCount, setShareCount] = useState(() => {
@@ -25,18 +26,22 @@ function App() {
     const storedMoney = localStorage.getItem("money");
     return storedMoney ? parseFloat(storedMoney) : 10;
   });
-  var [moneyPerClick, setMoneyPerClick] = useState(() => {
-    const storedMoneyPerClick = localStorage.getItem("moneyPerClick");
-    return storedMoneyPerClick ? parseFloat(storedMoneyPerClick) : 1;
-  });
   var [gameView, setGameView] = useState("producers");
   var [purchaseAmount, setPurchaseAmount] = useState(() => {
     const storedPurchaseAmount = localStorage.getItem("purchaseAmount");
     return storedPurchaseAmount ? parseFloat(storedPurchaseAmount) : 1;
   });
-  var [moneyPerClickUpgradeCost, setMoneyPerClickUpgradeCost] = useState(() => {
-    const storedMoneyPerClickUpgradeCost = localStorage.getItem("moneyPerClickUpgradeCost");
-    return storedMoneyPerClickUpgradeCost ? parseFloat(storedMoneyPerClickUpgradeCost) : 10;
+  var [businessmanCount, setBusinessmanCount] = useState(() => {
+    const storedBusinessmanCount = localStorage.getItem("businessmanCount");
+    return storedBusinessmanCount ? parseFloat(storedBusinessmanCount) : 0;
+  });
+  var [businessmanSharePayout, setBusinessmanSharePayout] = useState(() => {
+    const storedBusinessmanSharePayout = localStorage.getItem("businessmanSharePayout");
+    return storedBusinessmanSharePayout ? parseFloat(storedBusinessmanSharePayout) : 1;
+  });
+  var [businessmanCost, setNextBusinessmanCost] = useState(() => {
+    const storedbusinessmanCost = localStorage.getItem("businessmanCost");
+    return storedbusinessmanCost ? parseFloat(storedbusinessmanCost) : 100;
   });
 
   const shareCountRef = useRef(shareCount)
@@ -49,11 +54,22 @@ function App() {
     shareDividendRef.current = shareDividend;
   }, [shareDividend]);
 
+  const businessmanCountRef = useRef(businessmanCount)
+  useEffect(() => {
+    businessmanCountRef.current = businessmanCount;
+  }, [businessmanCount]);
+
+  const businessmanSharePayoutRef = useRef(businessmanSharePayout)
+  useEffect(() => {
+    businessmanSharePayoutRef.current = businessmanSharePayout
+  }, [businessmanSharePayout])
+
   useEffect(() => {
     const id = setInterval(() => {
       setMoney(prev =>
         Math.round((prev + shareCountRef.current * shareDividendRef.current) * 100) / 100
       );
+      setShareCount(prev => prev + businessmanCountRef.current * businessmanSharePayoutRef.current)
     }, 1000);
     return () => clearInterval(id);
   }, []);
@@ -75,19 +91,27 @@ function App() {
   }, [purchaseAmount]);
 
   useEffect(() => {
-    localStorage.setItem("moneyPerClick", moneyPerClick.toString());
-  }, [moneyPerClick]);
+    localStorage.setItem("businessmanCount", businessmanCount.toString());
+  }, [businessmanCount]);
 
   useEffect(() => {
-    localStorage.setItem("moneyPerClickUpgradeCost", moneyPerClickUpgradeCost.toString());
-  }, [moneyPerClickUpgradeCost]);
+    localStorage.setItem("businessmanSharePayout", businessmanSharePayout.toString());
+  }, [businessmanSharePayout]);
 
-  const increaseMoney = () => {
-    setMoney(prev => prev + moneyPerClick)
+  useEffect(() => {
+    localStorage.setItem("businessmanCost", businessmanCost.toString());
+  }, [businessmanCost]);
+
+  const increaseMoney = (increaseAmount) => {
+    setMoney(prev => prev + increaseAmount)
   }
 
   const decreaseMoney = (decreaseAmount) => {
     setMoney(prev => prev - decreaseAmount)
+  }
+
+  const decreaseShares = (decreaseAmount) => {
+    setShareCount(prev => prev - decreaseAmount)
   }
 
   const purchaseShares = (purchaseAmount, purchaseCost, newShareCost) => {
@@ -99,45 +123,54 @@ function App() {
     setNextShareCost(newShareCost);
   };
 
-  const purchaseMoneyPerClickUpgrade = () => {
-    if (moneyPerClickUpgradeCost > money)
+  const purchaseBusinessman = (purchaseAmount, purchaseCost, newBusinessmanCost) => {
+    if (purchaseCost > shareCount)
       return
 
-    decreaseMoney(moneyPerClickUpgradeCost)
-    setMoneyPerClickUpgradeCost(prev => prev * 2)
-    setMoneyPerClick(prev => prev + 1)
+    decreaseShares(purchaseCost)
+    setBusinessmanCount(prev => prev + purchaseAmount)
+    setNextBusinessmanCost(newBusinessmanCost)
   }
 
   const setShareDividendAmount = (newDividend) => {
     setShareDividend(newDividend)
   };
 
-  const setMoneyPerClickAmount = (newMoneyPerClick) => {
-    setMoneyPerClick(newMoneyPerClick)
-  }
-
   const setNextShareCost = (newShareCost) => {
     setShareCost(newShareCost)
   }
 
   const shareCountString = useMemo(
-    () => `Shares: ${shareCount}`,
-    [shareCount]
+    () => {
+      var {formattedNumber: formattedShares, suffix: sharesSuffix} = formatNumber(shareCount);
+      var {formattedNumber: formattedShareIncome, suffix: shareIncomeSuffix} = formatNumber(businessmanCount * businessmanSharePayout);
+      return `Shares: ${formattedShares.toFixed(2)}${sharesSuffix} ($${formattedShareIncome.toFixed(2)}${shareIncomeSuffix}/s)`
+    },
+    [shareCount, businessmanCount, businessmanSharePayout]
   );
 
   const moneyString = useMemo(
-    () => `Money: $${money.toFixed(2)} ($${((shareCount * shareDividend) * 100) / 100}/s)`,
+    () => {
+      const {formattedNumber: formattedMoney, suffix: moneySuffix} = formatNumber(money);
+      const {formattedNumber: formattedIncome, suffix: incomeSuffix} = formatNumber(shareCount * shareDividend);
+      return `Money: $${formattedMoney.toFixed(2)}${moneySuffix} ($${formattedIncome.toFixed(2)}${incomeSuffix}/s)`
+    },
     [money, shareCount, shareDividend]
   );
 
+  const businessManString = useMemo(
+    () => `Businessmen: ${businessmanCount}`,
+    [businessmanCount]
+  )
+
   return (
     <>
-      <Header shareCountString={shareCountString} shareDividend={shareDividendRef.current} moneyString={moneyString}/>
+      <Header shareCountString={shareCountString} shareDividend={shareDividendRef.current} moneyString={moneyString} businessManString={businessManString}/>
       <div className="gameLayout">
         <SideNav onSelectView={setGameView} currentPurchaseAmount={purchaseAmount} onSelectPurchaseAmount={setPurchaseAmount} />
-        <MainGame gameView={gameView} increaseMoneyFunction={increaseMoney} moneyPerClick={moneyPerClick}
-          purchaseAmount={purchaseAmount} pruchaseShareCountFunction={purchaseShares} shareCost={shareCost}
-          clickMoneyUpgradeCost={moneyPerClickUpgradeCost} purchaseMoneyPerClickUpgradeFunction={purchaseMoneyPerClickUpgrade}
+        <MainGame gameView={gameView} increaseMoneyFunction={increaseMoney} purchaseAmount={purchaseAmount}
+          pruchaseShareCountFunction={purchaseShares} shareCost={shareCost} businessmanCost={businessmanCost}
+          pruchaseBusinessmanFunction={purchaseBusinessman}
         />
       </div>
     </>

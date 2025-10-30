@@ -5,22 +5,18 @@ import Upgrades from './Upgrades';
 
 function MainGame(
   {
-    gameView, increaseMoneyFunction, moneyPerClick, pruchaseShareCountFunction, purchaseAmount,
-    shareCost, clickMoneyUpgradeCost, purchaseMoneyPerClickUpgradeFunction
+    gameView, pruchaseShareCountFunction, purchaseAmount, shareCost, businessmanCost, pruchaseBusinessmanFunction
   }
 ) {
   var game_view = null
     switch (gameView) {
       case "producers":
-        game_view = <Producers increaseMoneyFunction={increaseMoneyFunction} moneyPerClick={moneyPerClick} 
-          pruchaseShareCountFunction={pruchaseShareCountFunction} purchaseAmount={purchaseAmount}
-          shareCost={shareCost}
+        game_view = <Producers pruchaseShareCountFunction={pruchaseShareCountFunction} purchaseAmount={purchaseAmount}
+          shareCost={shareCost} businessmanCost={businessmanCost} pruchaseBusinessmanFunction={pruchaseBusinessmanFunction}
         />;
         break;
       case "upgrades":
-        game_view = <Upgrades currentMoneyPerClick={moneyPerClick} clickMoneyUpgradeCost={clickMoneyUpgradeCost} 
-          purchaseMoneyPerClickUpgradeFunction={purchaseMoneyPerClickUpgradeFunction}
-        />;
+        game_view = <Upgrades />;
         break;
       default:
         game_view = <div>Something went wrong</div>;
