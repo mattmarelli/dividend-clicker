@@ -20,7 +20,7 @@ function Producers({pruchaseShareCountFunction, purchaseAmount, shareCost, busin
 
   const {sharePurchaseCost, newShareCost, businessmanPurchaseCost, newBusinessmanCost} = CalcualteSharePurchaseCost()
   const {formattedNumber: formattedSharePurchaseCost, suffix: sharePurchaseSuffix} = formatNumber(sharePurchaseCost)
-  const {formattedNumber: formattedBusinessmanPurchaseCost, suffix: businessmanPurchaseSuffix} = formatNumber(businessmanCost)
+  const {formattedNumber: formattedBusinessmanPurchaseCost, suffix: businessmanPurchaseSuffix} = formatNumber(businessmanPurchaseCost)
 
   return (
     <div>
