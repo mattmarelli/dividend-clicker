@@ -1,176 +1,154 @@
 import './App.css';
 
 import {
-  useEffect,
   useMemo,
-  useRef,
   useState,
 } from 'react';
 
 import Header from './components/Header';
 import MainGame from './components/MainGame';
 import SideNav from './components/SideNav';
-import formatNumber from './helpers';
+import {
+  formatNumber,
+  useLocalStorage,
+} from './helpers';
+import { AccreditedInvestors } from './modules/AccreditedInvestors';
+import { Businessman } from './modules/Businessman';
+import { Founders } from './modules/Founders';
+import { Game } from './modules/Game';
+import { Investors } from './modules/Investors';
+import { Money } from './modules/Money';
+import { Shares } from './modules/Shares';
 
 function App() {
-  var [shareCount, setShareCount] = useState(() => {
-    const storedShares = localStorage.getItem("shares");
-    return storedShares ? parseFloat(storedShares) : 0;
-  });
-  var [shareDividend, setShareDividend] = useState(1);
-  var [shareCost, setShareCost] = useState(() => {
-    const storedShareCost = localStorage.getItem("shareCost");
-    return storedShareCost ? parseFloat(storedShareCost) : 1;
-  });
-  var [money, setMoney] = useState(() => {
-    const storedMoney = localStorage.getItem("money");
-    return storedMoney ? parseFloat(storedMoney) : 10;
-  });
-  var [gameView, setGameView] = useState("producers");
-  var [purchaseAmount, setPurchaseAmount] = useState(() => {
-    const storedPurchaseAmount = localStorage.getItem("purchaseAmount");
-    return storedPurchaseAmount ? parseFloat(storedPurchaseAmount) : 1;
-  });
-  var [businessmanCount, setBusinessmanCount] = useState(() => {
-    const storedBusinessmanCount = localStorage.getItem("businessmanCount");
-    return storedBusinessmanCount ? parseFloat(storedBusinessmanCount) : 0;
-  });
-  var [businessmanSharePayout, setBusinessmanSharePayout] = useState(() => {
-    const storedBusinessmanSharePayout = localStorage.getItem("businessmanSharePayout");
-    return storedBusinessmanSharePayout ? parseFloat(storedBusinessmanSharePayout) : 1;
-  });
-  var [businessmanCost, setNextBusinessmanCost] = useState(() => {
-    const storedbusinessmanCost = localStorage.getItem("businessmanCost");
-    return storedbusinessmanCost ? parseFloat(storedbusinessmanCost) : 100;
-  });
-
-  const shareCountRef = useRef(shareCount)
-  useEffect(() => {
-    shareCountRef.current = shareCount;
-  }, [shareCount]);
-
-  const shareDividendRef = useRef(shareDividend)
-  useEffect(() => {
-    shareDividendRef.current = shareDividend;
-  }, [shareDividend]);
-
-  const businessmanCountRef = useRef(businessmanCount)
-  useEffect(() => {
-    businessmanCountRef.current = businessmanCount;
-  }, [businessmanCount]);
-
-  const businessmanSharePayoutRef = useRef(businessmanSharePayout)
-  useEffect(() => {
-    businessmanSharePayoutRef.current = businessmanSharePayout
-  }, [businessmanSharePayout])
-
-  useEffect(() => {
-    const id = setInterval(() => {
-      setMoney(prev =>
-        Math.round((prev + shareCountRef.current * shareDividendRef.current) * 100) / 100
-      );
-      setShareCount(prev => prev + businessmanCountRef.current * businessmanSharePayoutRef.current)
-    }, 1000);
-    return () => clearInterval(id);
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem("money", money.toString());
-  }, [money]);
-
-  useEffect(() => {
-    localStorage.setItem("shares", shareCount.toString());
-  }, [shareCount]);
-
-  useEffect(() => {
-    localStorage.setItem("shareCost", shareCost.toString());
-  }, [shareCost]);
-
-  useEffect(() => {
-    localStorage.setItem("purchaseAmount", purchaseAmount.toString());
-  }, [purchaseAmount]);
-
-  useEffect(() => {
-    localStorage.setItem("businessmanCount", businessmanCount.toString());
-  }, [businessmanCount]);
-
-  useEffect(() => {
-    localStorage.setItem("businessmanSharePayout", businessmanSharePayout.toString());
-  }, [businessmanSharePayout]);
-
-  useEffect(() => {
-    localStorage.setItem("businessmanCost", businessmanCost.toString());
-  }, [businessmanCost]);
-
-  const increaseMoney = (increaseAmount) => {
-    setMoney(prev => prev + increaseAmount)
-  }
-
-  const decreaseMoney = (decreaseAmount) => {
-    setMoney(prev => prev - decreaseAmount)
-  }
-
-  const decreaseShares = (decreaseAmount) => {
-    setShareCount(prev => prev - decreaseAmount)
-  }
+  // Basic game logic
+  const [gameView, setGameView] = useState("producers");
+  const [purchaseAmount, setPurchaseAmount] = useLocalStorage("purchaseAmount", 1);
+  const money = Money()
+  const shares = Shares()
+  const businessman = Businessman()
+  const investors = Investors()
+  const accreditedInvestors = AccreditedInvestors()
+  const founders = Founders()
+  Game(
+    money.setMoney,
+    shares.setShareCount,
+    shares.shareCount,
+    shares.shareDividend,
+    businessman.businessmanCount,
+    businessman.businessmanSharePayout,
+    businessman.setBusinessmanCount,
+    investors.investorCount,
+    investors.investorPayout,
+    investors.setInvestorCount,
+    accreditedInvestors.accreditedInvestorCount,
+    accreditedInvestors.accreditedInvestorPayout,
+    accreditedInvestors.setAccreditedInvestorCount,
+    founders.founderCount,
+    founders.founderPayout,
+  )
 
   const purchaseShares = (purchaseAmount, purchaseCost, newShareCost) => {
-    if (purchaseCost > money)
+    if (purchaseCost > money.money)
       return
 
-    decreaseMoney(purchaseCost);
-    setShareCount(prev => prev + purchaseAmount);
-    setNextShareCost(newShareCost);
+    money.decreaseMoney(purchaseCost);
+    shares.setShareCount(prev => prev + purchaseAmount);
+    shares.setNextShareCost(newShareCost);
   };
 
   const purchaseBusinessman = (purchaseAmount, purchaseCost, newBusinessmanCost) => {
-    if (purchaseCost > shareCount)
+    if (purchaseCost > shares.shareCount)
       return
 
-    decreaseShares(purchaseCost)
-    setBusinessmanCount(prev => prev + purchaseAmount)
-    setNextBusinessmanCost(newBusinessmanCost)
+    shares.decreaseShares(purchaseCost)
+    businessman.setBusinessmanCount(prev => prev + purchaseAmount)
+    businessman.setNextBusinessmanCost(newBusinessmanCost)
   }
 
-  const setShareDividendAmount = (newDividend) => {
-    setShareDividend(newDividend)
-  };
+  const purchaseInvestor = (purchaseAmount, purchaseCost, newInvestorCost) => {
+    if (purchaseCost > businessman.businessmanCount)
+      return
+    
+    businessman.decreaseBusinessman(purchaseAmount)
+    investors.setInvestorCount(prev => prev + purchaseAmount)
+    investors.setNextInvestorCost(newInvestorCost)
+  }
 
-  const setNextShareCost = (newShareCost) => {
-    setShareCost(newShareCost)
+  const purchaseAccreditedInvestor = (purchaseAmount, purchaseCost, newAccreditedInvestorCost) => {
+    if (purchaseCost > investors.investorCount)
+      return
+
+    investors.decreaseInvestors(purchaseAmount)
+    accreditedInvestors.setAccreditedInvestorCount(prev => prev + purchaseAmount)
+    accreditedInvestors.setNextAccreditedInvestorCost(newAccreditedInvestorCost)
+  }
+
+  const purchaseFounder = (purchaseAmount, purchaseCost, newFounderCost) => {
+    if (purchaseCost > accreditedInvestors.accreditedInvestorCount)
+      return
+
+    accreditedInvestors.decreaseAccreditedInvestors(purchaseAmount)
+    founders.setFounderCount(prev => prev + purchaseAmount)
+    founders.setNextFounderCost(newFounderCost)
   }
 
   const shareCountString = useMemo(
     () => {
-      var {formattedNumber: formattedShares, suffix: sharesSuffix} = formatNumber(shareCount);
-      var {formattedNumber: formattedShareIncome, suffix: shareIncomeSuffix} = formatNumber(businessmanCount * businessmanSharePayout);
+      const {formattedNumber: formattedShares, suffix: sharesSuffix} = formatNumber(shares.shareCount);
+      const {formattedNumber: formattedShareIncome, suffix: shareIncomeSuffix} = formatNumber(businessman.businessmanCount * businessman.businessmanSharePayout);
       return `Shares: ${formattedShares.toFixed(2)}${sharesSuffix} ($${formattedShareIncome.toFixed(2)}${shareIncomeSuffix}/s)`
     },
-    [shareCount, businessmanCount, businessmanSharePayout]
+    [shares.shareCount, businessman.businessmanCount, businessman.businessmanSharePayout]
   );
 
   const moneyString = useMemo(
     () => {
-      const {formattedNumber: formattedMoney, suffix: moneySuffix} = formatNumber(money);
-      const {formattedNumber: formattedIncome, suffix: incomeSuffix} = formatNumber(shareCount * shareDividend);
+      const {formattedNumber: formattedMoney, suffix: moneySuffix} = formatNumber(money.moneyRef.current);
+      const {formattedNumber: formattedIncome, suffix: incomeSuffix} = formatNumber(shares.shareCount * shares.shareDividend);
       return `Money: $${formattedMoney.toFixed(2)}${moneySuffix} ($${formattedIncome.toFixed(2)}${incomeSuffix}/s)`
     },
-    [money, shareCount, shareDividend]
+    [shares.shareCount, shares.shareDividend, money.moneyRef]
   );
 
   const businessManString = useMemo(
-    () => `Businessmen: ${businessmanCount}`,
-    [businessmanCount]
+    () => `Businessmen: ${businessman.businessmanCount}`,
+    [businessman.businessmanCount]
+  )
+
+  const investorString = useMemo (
+    () => `Investors: ${investors.investorCount}`,
+    [investors.investorCount]
   )
 
   return (
     <>
-      <Header shareCountString={shareCountString} shareDividend={shareDividendRef.current} moneyString={moneyString} businessManString={businessManString}/>
+      <Header
+        shareCountString={shareCountString}
+        shareDividend={shares.shareDividendRef.current}
+        moneyString={moneyString}
+        businessManString={businessManString}
+        investorString={investorString}
+      />
       <div className="gameLayout">
-        <SideNav onSelectView={setGameView} currentPurchaseAmount={purchaseAmount} onSelectPurchaseAmount={setPurchaseAmount} />
-        <MainGame gameView={gameView} increaseMoneyFunction={increaseMoney} purchaseAmount={purchaseAmount}
-          pruchaseShareCountFunction={purchaseShares} shareCost={shareCost} businessmanCost={businessmanCost}
+        <SideNav
+          onSelectView={setGameView}
+          currentPurchaseAmount={purchaseAmount}
+          onSelectPurchaseAmount={setPurchaseAmount}
+        />
+        <MainGame
+          gameView={gameView}
+          currentMoney={money.money}
+          increaseMoneyFunction={money.increaseMoney}
+          purchaseAmount={purchaseAmount}
+          pruchaseShareCountFunction={purchaseShares}
+          shareCost={shares.shareCost}
+          currentShares={shares.shareCount}
+          businessmanCost={businessman.businessmanCost}
           pruchaseBusinessmanFunction={purchaseBusinessman}
+          investorCost={investors.investorCost}
+          purchaseInvestorFunction={purchaseInvestor}
+          currentBusinessman={businessman.businessmanCount}
         />
       </div>
     </>

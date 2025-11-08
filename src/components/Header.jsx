@@ -1,6 +1,12 @@
 import '../css/Header.css';
 
-function Header({shareCountString, shareDividend, moneyString, businessManString}) {
+function Header({
+  shareCountString,
+  shareDividend,
+  moneyString,
+  businessManString,
+  investorString
+}) {
 
   return (
     <div className="header">
@@ -15,6 +21,15 @@ function Header({shareCountString, shareDividend, moneyString, businessManString
         </div>
         <div className="businessmanLabel">
           {businessManString}
+        </div>
+        <div className="investorLabel">
+          {investorString} 
+        </div>
+        <div className="accreditedInvestorLabel">
+          Accredited Investors: 
+        </div>
+        <div className="founderLabel">
+          Founders: 
         </div>
     </div>
   )

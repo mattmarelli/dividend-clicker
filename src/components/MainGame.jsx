@@ -3,16 +3,33 @@ import '../css/MainGame.css';
 import Producers from './Producers';
 import Upgrades from './Upgrades';
 
-function MainGame(
-  {
-    gameView, pruchaseShareCountFunction, purchaseAmount, shareCost, businessmanCost, pruchaseBusinessmanFunction
-  }
-) {
-  var game_view = null
+function MainGame({
+  gameView,
+  currentMoney,
+  pruchaseShareCountFunction,
+  purchaseAmount,
+  shareCost,
+  currentShares,
+  businessmanCost,
+  pruchaseBusinessmanFunction,
+  purchaseInvestorFunction,
+  investorCost,
+  currentBusinessman,
+}) {
+  let game_view = null
     switch (gameView) {
       case "producers":
-        game_view = <Producers pruchaseShareCountFunction={pruchaseShareCountFunction} purchaseAmount={purchaseAmount}
-          shareCost={shareCost} businessmanCost={businessmanCost} pruchaseBusinessmanFunction={pruchaseBusinessmanFunction}
+        game_view = <Producers 
+          currentMoney={currentMoney}
+          pruchaseShareCountFunction={pruchaseShareCountFunction}
+          purchaseAmount={purchaseAmount}
+          shareCost={shareCost}
+          currentShares={currentShares}
+          businessmanCost={businessmanCost}
+          pruchaseBusinessmanFunction={pruchaseBusinessmanFunction}
+          purchaseInvestorFunction={purchaseInvestorFunction}
+          investorCost={investorCost}
+          currentBusinessman={currentBusinessman}
         />;
         break;
       case "upgrades":
