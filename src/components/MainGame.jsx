@@ -15,6 +15,12 @@ function MainGame({
   purchaseInvestorFunction,
   investorCost,
   currentBusinessman,
+  purchaseAccreditedInvestorFunction,
+  accreditedInvestorCost,
+  currentInvestors,
+  pruchaseFounderFunction,
+  founderCost,
+  currentAccreditedInvestors,
 }) {
   let game_view = null
     switch (gameView) {
@@ -30,6 +36,12 @@ function MainGame({
           purchaseInvestorFunction={purchaseInvestorFunction}
           investorCost={investorCost}
           currentBusinessman={currentBusinessman}
+          purchaseAccreditedInvestorFunction={purchaseAccreditedInvestorFunction}
+          accreditedInvestorCost={accreditedInvestorCost}
+          currentInvestors={currentInvestors}
+          pruchaseFounderFunction={pruchaseFounderFunction}
+          founderCost={founderCost}
+          currentAccreditedInvestors={currentAccreditedInvestors}
         />;
         break;
       case "upgrades":

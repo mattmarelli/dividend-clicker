@@ -5,7 +5,9 @@ function Header({
   shareDividend,
   moneyString,
   businessManString,
-  investorString
+  investorString,
+  accreditedInvestorString,
+  founderString,
 }) {
 
   return (
@@ -26,10 +28,10 @@ function Header({
           {investorString} 
         </div>
         <div className="accreditedInvestorLabel">
-          Accredited Investors: 
+          {accreditedInvestorString} 
         </div>
         <div className="founderLabel">
-          Founders: 
+          {founderString}
         </div>
     </div>
   )
